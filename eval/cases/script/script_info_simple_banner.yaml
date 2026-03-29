@@ -1,0 +1,27 @@
+{
+  "id": "script_info_simple_banner",
+  "layer": "script",
+  "fixture": {
+    "source": "eval/fixtures/simple_banner.psd",
+    "copy_to_temp": false
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/info.py",
+      "{fixture_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "文件:",
+      "[Group] Header",
+      "BrandBadge",
+      "ProductShot"
+    ],
+    "stderr_empty": true
+  },
+  "tags": ["script", "read_only", "synthetic", "info"]
+}

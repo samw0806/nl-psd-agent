@@ -1,0 +1,13 @@
+.tmp/*
+!.tmp/.gitkeep
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.bak
+.venv/
+layers/
+examples/*.psd
+examples/*.psb
+eval/results/*
+!eval/results/.gitkeep

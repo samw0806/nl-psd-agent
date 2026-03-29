@@ -1,0 +1,52 @@
+{
+  "id": "script_resample_product",
+  "layer": "script",
+  "fixture": {
+    "source": "eval/fixtures/pixel_resample_only.psd",
+    "copy_to_temp": true
+  },
+  "paths": {
+    "modified_path": "{workdir}/resampled.psd"
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/resample_layer.py",
+      "{fixture_path}",
+      "Body/Product",
+      "--scale",
+      "0.5",
+      "--output",
+      "{modified_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "新尺寸:   80×120"
+    ],
+    "files_exist": [
+      "{modified_path}"
+    ],
+    "stderr_empty": true,
+    "followup_commands": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/info.py",
+          "{modified_path}"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "stdout_contains": [
+            "Product",
+            "尺寸:80×120"
+          ],
+          "stderr_empty": true
+        }
+      }
+    ]
+  },
+  "tags": ["script", "mutation", "synthetic", "resample"]
+}

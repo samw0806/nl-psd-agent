@@ -1,0 +1,55 @@
+{
+  "id": "script_add_layer_center_logo",
+  "layer": "script",
+  "fixture": {
+    "source": "eval/fixtures/mutation_sandbox.psd",
+    "copy_to_temp": true
+  },
+  "paths": {
+    "modified_path": "{workdir}/mutation_added.psd"
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/add_layer.py",
+      "{fixture_path}",
+      "eval/assets/logo_square.png",
+      "--name",
+      "InsertedLogo",
+      "--width",
+      "96",
+      "--center",
+      "--output",
+      "{modified_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "已添加图层 'InsertedLogo'",
+      "最终尺寸: 96×96"
+    ],
+    "files_exist": [
+      "{modified_path}"
+    ],
+    "stderr_empty": true,
+    "followup_commands": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/info.py",
+          "{modified_path}"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "stdout_contains": [
+            "InsertedLogo"
+          ],
+          "stderr_empty": true
+        }
+      }
+    ]
+  },
+  "tags": ["script", "mutation", "synthetic", "add_layer"]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "script_local_example_extract_logo",
+  "layer": "script",
+  "fixture": {
+    "source": "examples/100009151672.psb",
+    "copy_to_temp": false,
+    "allow_missing": true
+  },
+  "paths": {
+    "extract_path": "{workdir}/the_whoo.bin"
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/extract_smart_object.py",
+      "{fixture_path}",
+      "LOGO 拷贝 2/THE WHOO",
+      "--output",
+      "{extract_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "已提取智能对象内容",
+      "LOGO 拷贝 2/THE WHOO"
+    ],
+    "files_exist": [
+      "{extract_path}"
+    ],
+    "files_min_size": {
+      "{extract_path}": 1000
+    },
+    "stderr_empty": true
+  },
+  "tags": ["script", "read_only", "local_example", "extract_smart_object"]
+}

@@ -1,0 +1,74 @@
+{
+  "id": "script_visibility_hide_brand_badge",
+  "layer": "script",
+  "fixture": {
+    "source": "eval/fixtures/mutation_sandbox.psd",
+    "copy_to_temp": true
+  },
+  "paths": {
+    "modified_path": "{workdir}/mutation_hidden.psd",
+    "preview_path": "{workdir}/mutation_hidden.png"
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/visibility.py",
+      "{fixture_path}",
+      "Header/BrandBadge",
+      "--hide",
+      "--output",
+      "{modified_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "已隐藏"
+    ],
+    "files_exist": [
+      "{modified_path}"
+    ],
+    "stderr_empty": true,
+    "followup_commands": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/info.py",
+          "{modified_path}"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "stdout_contains": [
+            "BrandBadge",
+            "隐藏"
+          ],
+          "stderr_empty": true
+        }
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/preview.py",
+          "{modified_path}",
+          "--output",
+          "{preview_path}"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "stdout_contains": [
+            "预览已保存到"
+          ],
+          "files_exist": [
+            "{preview_path}"
+          ],
+          "files_min_size": {
+            "{preview_path}": 1000
+          },
+          "stderr_empty": true
+        }
+      }
+    ]
+  },
+  "tags": ["script", "mutation", "synthetic", "visibility"]
+}

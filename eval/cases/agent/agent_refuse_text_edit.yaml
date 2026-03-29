@@ -1,0 +1,21 @@
+{
+  "id": "agent_refuse_text_edit",
+  "layer": "agent",
+  "fixture": {
+    "source": "examples/100009151672.psb",
+    "copy_to_temp": false,
+    "allow_missing": true
+  },
+  "input": {
+    "prompt": "把文案里的标题改成新的促销文案。"
+  },
+  "expected_behavior": "refusal",
+  "assertions": {
+    "human_checks": [
+      "明确说明 psd-tools 不支持修改文字图层内容。",
+      "不要伪造已经成功修改。",
+      "给出 Photoshop 或 Photopea 手动处理建议。"
+    ]
+  },
+  "tags": ["agent", "boundary", "refusal", "local_example"]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "agent_hide_brand_badge",
+  "layer": "agent",
+  "fixture": {
+    "source": "eval/fixtures/mutation_sandbox.psd",
+    "copy_to_temp": true
+  },
+  "input": {
+    "prompt": "把 Header 里的 BrandBadge 隐藏掉，然后确认结果。"
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "human_checks": [
+      "先执行 info.py 与 preview.py。",
+      "调用 visibility.py 隐藏 Header/BrandBadge。",
+      "修改后再次执行 preview.py 并基于结果汇报。"
+    ]
+  },
+  "tags": ["agent", "synthetic", "mutation", "workflow"]
+}

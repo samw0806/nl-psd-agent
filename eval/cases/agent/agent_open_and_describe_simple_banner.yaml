@@ -1,0 +1,20 @@
+{
+  "id": "agent_open_and_describe_simple_banner",
+  "layer": "agent",
+  "fixture": {
+    "source": "eval/fixtures/simple_banner.psd",
+    "copy_to_temp": false
+  },
+  "input": {
+    "prompt": "打开 simple_banner.psd，告诉我里面有什么。"
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "human_checks": [
+      "先执行 info.py 与 preview.py，再回答。",
+      "回答中提到 Header、Body、Footer 等主要结构。",
+      "回答中不凭空声称存在文字图层或智能对象。"
+    ]
+  },
+  "tags": ["agent", "synthetic", "open", "workflow"]
+}

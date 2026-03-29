@@ -1,0 +1,27 @@
+{
+  "id": "script_local_example_read_text",
+  "layer": "script",
+  "fixture": {
+    "source": "examples/100009151672.psb",
+    "copy_to_temp": false,
+    "allow_missing": true
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/read_text.py",
+      "{fixture_path}",
+      "文案/深润熟龄肌 绽现饱满嘭弹"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "文字图层: 文案/深润熟龄肌 绽现饱满嘭弹",
+      "AlibabaPuHuiTi-Regular"
+    ],
+    "stderr_empty": true
+  },
+  "tags": ["script", "read_only", "local_example", "read_text"]
+}

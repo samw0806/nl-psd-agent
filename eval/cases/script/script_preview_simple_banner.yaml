@@ -1,0 +1,35 @@
+{
+  "id": "script_preview_simple_banner",
+  "layer": "script",
+  "fixture": {
+    "source": "eval/fixtures/simple_banner.psd",
+    "copy_to_temp": false
+  },
+  "paths": {
+    "preview_path": "{workdir}/simple_banner_preview.png"
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/preview.py",
+      "{fixture_path}",
+      "--output",
+      "{preview_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "预览已保存到"
+    ],
+    "files_exist": [
+      "{preview_path}"
+    ],
+    "files_min_size": {
+      "{preview_path}": 1000
+    },
+    "stderr_empty": true
+  },
+  "tags": ["script", "read_only", "synthetic", "preview"]
+}
