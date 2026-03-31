@@ -28,6 +28,7 @@ source .venv/bin/activate
 - 重命名、删除、移动、重新排序图层
 - 从外部图片插入新像素图层（支持等比缩放、contain、cover、居中）
 - 对像素图层做重建式缩放（本质是删旧建新，会警告丢失属性）
+- 将 Smart Object / Shape / Type 图层栅格化为像素图层（执行前须告知用户此操作不可逆）
 - 创建和管理图层组
 - 读取文字图层内容、字体、字号、颜色（只读）
 - 提取智能对象中的嵌入文件
@@ -40,6 +41,11 @@ source .venv/bin/activate
 - 修改图层样式（投影、描边、发光等）
 - 应用/修改调整图层效果
 - Photoshop 式原生变换（任意图层的自由移动/缩放/旋转）
+
+**已知限制：**
+- 栅格化智能对象是不可逆操作，会永久丢失矢量/文字/智能对象编辑性
+- 某些包含复杂嵌入内容的智能对象可能无法栅格化，建议在 Photoshop 中手动处理
+- 如果操作失败，系统会自动回滚到操作前的状态
 
 遇到不支持的操作时，直接告知用户并建议使用 Photoshop 手动处理。
 
@@ -76,6 +82,7 @@ move_layer.py       <psd> "path" --to-group "group"/--to-root
 remove_layer.py     <psd> "path"
 add_layer.py        <psd> <image> --name "名" [尺寸策略] [--center]
 resample_layer.py   <psd> "path" --scale/--width/--height/--fit-contain   ⚠️ 仅 pixel 层
+rasterize_layer.py  <psd> "path" [尺寸策略]                                ⚠️ 不可逆，Smart/Shape/Type → Pixel
 create_group.py     <psd> "组名" [--layers "A,B,C"]
 export.py           <psd> <output.png/jpg> [--quality N] [--max-size N]
 export_layers.py    <psd> [--output-dir ./layers/] [--visible-only]
@@ -134,4 +141,12 @@ python scripts/info.py file.psb
 # 确认后执行（会警告丢失属性）
 python scripts/resample_layer.py file.psb "Body/Product" --scale 0.8
 python scripts/preview.py file.psb
+```
+
+**缩放智能对象/Shape/文字图层**：
+```bash
+# 先告知用户：栅格化是不可逆操作，将永久丢失矢量/文字/智能对象编辑性，确认后再执行
+# 确认后执行：
+python scripts/rasterize_layer.py file.psd "SmartObj" --scale 0.8
+python scripts/preview.py file.psd
 ```
