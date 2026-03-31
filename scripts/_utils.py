@@ -3,7 +3,64 @@
 所有脚本共用此模块。
 """
 import sys
+import os
+
+# 强制设置 UTF-8 编码（必须在导入 psd_tools 之前）
+os.environ['LANG'] = 'C.UTF-8'
+os.environ['LC_ALL'] = 'C.UTF-8'
+os.environ['PYTHONIOENCODING'] = 'utf-8'
+
 from pathlib import Path
+
+# Monkey patch psd-tools 的编码问题（必须在导入任何 psd_tools 模块之前）
+import psd_tools.psd.bin_utils as bin_utils
+
+_original_write_pascal_string = bin_utils.write_pascal_string
+
+def _patched_write_pascal_string(fp, value, encoding="macroman", padding=2):
+    """修复 psd-tools 的编码问题：使用 UTF-8 而不是 macroman"""
+    # 尝试使用 UTF-8
+    try:
+        data = value.encode("utf-8")
+        written = bin_utils.write_fmt(fp, "B", len(data))
+        written += bin_utils.write_bytes(fp, data)
+        written += bin_utils.write_padding(fp, written, padding)
+        return written
+    except Exception:
+        # 回退到 ASCII + 替换不支持的字符
+        try:
+            data = value.encode("ascii", errors="replace")
+            written = bin_utils.write_fmt(fp, "B", len(data))
+            written += bin_utils.write_bytes(fp, data)
+            written += bin_utils.write_padding(fp, written, padding)
+            return written
+        except Exception:
+            # 最后回退到原始实现
+            return _original_write_pascal_string(fp, value, encoding, padding)
+
+# 应用 patch 到 bin_utils 模块
+bin_utils.write_pascal_string = _patched_write_pascal_string
+
+# 同时 patch 所有已经导入 write_pascal_string 的模块
+import psd_tools.psd.layer_and_mask
+psd_tools.psd.layer_and_mask.write_pascal_string = _patched_write_pascal_string
+
+import psd_tools.psd.image_resources
+psd_tools.psd.image_resources.write_pascal_string = _patched_write_pascal_string
+
+import psd_tools.psd.linked_layer
+psd_tools.psd.linked_layer.write_pascal_string = _patched_write_pascal_string
+
+import psd_tools.psd.patterns
+psd_tools.psd.patterns.write_pascal_string = _patched_write_pascal_string
+
+import psd_tools.psd.tagged_blocks
+psd_tools.psd.tagged_blocks.write_pascal_string = _patched_write_pascal_string
+
+import psd_tools.psd.filter_effects
+psd_tools.psd.filter_effects.write_pascal_string = _patched_write_pascal_string
+
+# 现在才导入 PSDImage
 from psd_tools import PSDImage
 
 
@@ -24,13 +81,35 @@ def open_psd(psd_path: str) -> PSDImage:
 
 
 def save_psd(psd: PSDImage, psd_path: str, output_path: str | None = None) -> str:
-    """保存 PSD 文件，返回实际保存路径。"""
+    """保存 PSD 文件，返回实际保存路径。使用临时文件 + 原子替换确保安全。"""
+    import shutil
+    import traceback
+
     target = output_path or psd_path
+    temp_path = Path(target).with_suffix('.psd.tmp')
+
     try:
-        psd.save(target)
+        # 先保存到临时文件
+        psd.save(str(temp_path))
+
+        # 验证临时文件可读
+        try:
+            PSDImage.open(str(temp_path))
+        except Exception as e:
+            print(f"错误：保存的文件无法读取: {e}", file=sys.stderr)
+            if temp_path.exists():
+                temp_path.unlink()
+            sys.exit(1)
+
+        # 原子性替换
+        shutil.move(str(temp_path), target)
         return target
+
     except Exception as e:
+        if temp_path.exists():
+            temp_path.unlink()
         print(f"错误：无法保存文件 {target}: {e}", file=sys.stderr)
+        traceback.print_exc()  # 打印完整堆栈跟踪
         sys.exit(1)
 
 

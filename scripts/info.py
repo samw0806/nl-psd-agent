@@ -8,6 +8,14 @@ import sys
 import argparse
 from pathlib import Path
 
+# 确保 stdout 使用 UTF-8 编码
+if sys.stdout.encoding != 'utf-8':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr.encoding != 'utf-8':
+    import io
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 sys.path.insert(0, str(Path(__file__).parent))
 from _utils import open_psd, layer_type_label
 
