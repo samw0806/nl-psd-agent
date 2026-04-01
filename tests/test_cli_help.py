@@ -30,3 +30,6 @@ class CliHelpTests(unittest.TestCase):
 
     def test_resample_layer_help(self) -> None:
         self.assert_help_works("resample_layer.py")
+
+    def test_position_layer_help(self) -> None:
+        self.assert_help_works("position_layer.py")

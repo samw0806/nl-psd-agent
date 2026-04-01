@@ -174,3 +174,43 @@ def layer_type_label(layer) -> str:
         return "Adjust"
     else:
         return "Layer"
+
+
+def set_layer_position(layer, new_left: int, new_top: int) -> tuple[int, int]:
+    """
+    Move a non-group layer to an absolute position.
+
+    For RGBA pixel layers created via psd-tools, a user mask is often attached
+    automatically. Keep that mask bbox aligned with the layer bbox when moving.
+    Returns the applied (dx, dy).
+    """
+    old_left = layer.left
+    old_top = layer.top
+    dx = new_left - old_left
+    dy = new_top - old_top
+
+    layer.left = new_left
+    layer.top = new_top
+
+    if (dx or dy) and hasattr(layer, "has_mask") and layer.has_mask():
+        mask_data = getattr(layer._record, "mask_data", None)
+        if mask_data is not None:
+            mask_data.left += dx
+            mask_data.right += dx
+            mask_data.top += dy
+            mask_data.bottom += dy
+
+            if mask_data.real_left is not None:
+                mask_data.real_left += dx
+            if mask_data.real_right is not None:
+                mask_data.real_right += dx
+            if mask_data.real_top is not None:
+                mask_data.real_top += dy
+            if mask_data.real_bottom is not None:
+                mask_data.real_bottom += dy
+
+            if hasattr(layer, "_mask"):
+                delattr(layer, "_mask")
+            layer._psd._mark_updated()
+
+    return dx, dy

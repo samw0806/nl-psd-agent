@@ -101,7 +101,7 @@ async def upload_psd(sid: str, file: UploadFile = File(...)):
 
 def _generate_preview(sid: str, psd_path: str):
     preview_out = str(sess.get_preview_path(sid))
-    run_script("preview.py", [psd_path, "--output", preview_out])
+    run_script("preview.py", [psd_path, "--output", preview_out], timeout=180)
 
 
 # ──────────────── Preview ────────────────

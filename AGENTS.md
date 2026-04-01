@@ -9,6 +9,7 @@
 - **看到**文件的视觉效果（通过 preview.py 导出图片后查看）
 - 切换图层可见性、调整不透明度、更改混合模式
 - 重命名、删除、移动、重新排序图层
+- 移动非组图层的位置（left/top 坐标）
 - 从外部图片添加新像素图层（支持插入前缩放：等比缩放、contain、cover、居中放置）
 - 对普通像素图层执行重建式缩放（删旧层、造新层）
 - 创建和管理图层组
@@ -22,7 +23,8 @@
 - 编辑形状图层或智能对象的矢量/嵌入内容
 - 添加/修改图层样式（投影、描边、发光等）
 - 应用/修改调整图层效果
-- 对任意图层进行 Photoshop 式原生变换（自由移动位置、自由缩放、旋转）
+- 对任意图层进行 Photoshop 式原生变换（自由缩放、旋转）
+- 对组图层整体进行坐标移动
 - 保证文字图层、形状图层、智能对象在缩放后仍保持原语义
 
 ## 工作流程
@@ -58,6 +60,7 @@ python scripts/preview.py <文件路径>
 | rename.py | 重命名图层 | `python scripts/rename.py banner.psd "Layer 1" "Logo"` |
 | reorder.py | 图层上移/下移 | `python scripts/reorder.py banner.psd "Logo" --up` |
 | move_layer.py | 移动图层到组 | `python scripts/move_layer.py banner.psd "Logo" --to-group "Header"` |
+| position_layer.py | 移动非组图层坐标 | `python scripts/position_layer.py banner.psd "Logo" --dx 40 --dy 20` |
 | remove_layer.py | 删除图层 | `python scripts/remove_layer.py banner.psd "Header/Subtitle"` |
 | add_layer.py | 添加外部图片图层 | `python scripts/add_layer.py banner.psd logo.png --name "Logo" --width 400 --center` |
 | resample_layer.py | 像素图层重建式缩放 | `python scripts/resample_layer.py banner.psd "Body/Product" --scale 0.5` |
@@ -158,3 +161,12 @@ python scripts/preview.py banner.psd
 1. 先确认图层类型：`python scripts/info.py banner.psd`（确认是 [Pixel] 类型）
 2. 如果是 pixel：`python scripts/resample_layer.py banner.psd "Body/Product" --scale 0.8`
 3. 如果不是 pixel：告知用户此类型图层不支持重建式缩放
+
+### 场景 6：移动已有图层
+
+用户说："把 Body/ProductShot 往右 40px、往下 20px"
+
+正确做法：
+1. 先确认图层路径：`python scripts/info.py banner.psd`
+2. 执行位移：`python scripts/position_layer.py banner.psd "Body/ProductShot" --dx 40 --dy 20`
+3. 验证：`python scripts/preview.py banner.psd`，读取预览图确认

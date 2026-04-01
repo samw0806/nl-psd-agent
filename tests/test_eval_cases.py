@@ -12,7 +12,10 @@ class EvalCaseLoadingTests(unittest.TestCase):
         cases = discover_cases(ROOT / "eval" / "cases" / "script")
 
         self.assertTrue(cases, "expected at least one script evaluation case")
-        self.assertIn("script_info_simple_banner", {case["id"] for case in cases})
+        case_ids = {case["id"] for case in cases}
+        self.assertIn("script_info_simple_banner", case_ids)
+        self.assertIn("script_position_product", case_ids)
+        self.assertIn("script_position_transparent_cutout", case_ids)
 
     def test_agent_case_files_are_discoverable(self) -> None:
         from eval.lib import discover_cases

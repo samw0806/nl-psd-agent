@@ -75,7 +75,7 @@ def main():
     # 提取渲染像素（在删除图层之前先验证）
     img = None
     try:
-        img = layer.composite()
+        img = layer.composite(color=0.0, alpha=0.0, force=True)
     except Exception:
         try:
             img = layer.topil()
@@ -120,6 +120,7 @@ def main():
     # 创建新像素图层（保持原位置）
     try:
         new_layer = psd.create_pixel_layer(img, name=old_name, top=old_top, left=old_left)
+        new_layer.name = old_name  # 确保写入 UNICODE_LAYER_NAME tagged block，避免中文乱码
         new_layer.visible = old_visible
         new_layer.opacity = old_opacity
         new_layer.blend_mode = old_blend

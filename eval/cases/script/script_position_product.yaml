@@ -1,0 +1,55 @@
+{
+  "id": "script_position_product",
+  "layer": "script",
+  "fixture": {
+    "source": "eval/fixtures/simple_banner.psd",
+    "copy_to_temp": true
+  },
+  "paths": {
+    "modified_path": "{workdir}/positioned.psd"
+  },
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/position_layer.py",
+      "{fixture_path}",
+      "Body/ProductShot",
+      "--dx",
+      "40",
+      "--dy",
+      "20",
+      "--output",
+      "{modified_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "旧位置: left=520, top=88",
+      "新位置: left=560, top=108"
+    ],
+    "files_exist": [
+      "{modified_path}"
+    ],
+    "stderr_empty": true,
+    "followup_commands": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/info.py",
+          "{modified_path}"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "stdout_contains": [
+            "ProductShot",
+            "位置:(560,108)"
+          ],
+          "stderr_empty": true
+        }
+      }
+    ]
+  },
+  "tags": ["script", "mutation", "synthetic", "position"]
+}

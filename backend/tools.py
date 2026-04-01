@@ -158,6 +158,22 @@ TOOL_DEFINITIONS = [
         }
     },
     {
+        "name": "set_layer_position",
+        "description": "调整非组图层的位置。支持相对移动（dx/dy）或绝对坐标（left/top），两种模式不能混用。",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "psd_path": {"type": "string", "description": "PSD 文件绝对路径"},
+                "layer_path": {"type": "string", "description": "图层路径"},
+                "dx": {"type": "integer", "description": "x 方向相对位移（像素）"},
+                "dy": {"type": "integer", "description": "y 方向相对位移（像素）"},
+                "left": {"type": "integer", "description": "目标 left 坐标（像素）"},
+                "top": {"type": "integer", "description": "目标 top 坐标（像素）"}
+            },
+            "required": ["psd_path", "layer_path"]
+        }
+    },
+    {
         "name": "remove_layer",
         "description": "删除图层",
         "input_schema": {
@@ -278,6 +294,7 @@ def execute_tool(tool_name: str, tool_input: dict) -> str:
             "rename_layer": _rename_layer,
             "reorder_layer": _reorder_layer,
             "move_layer": _move_layer,
+            "set_layer_position": _set_layer_position,
             "remove_layer": _remove_layer,
             "add_layer": _add_layer,
             "resample_layer": _resample_layer,
@@ -359,6 +376,19 @@ def _move_layer(inp: dict) -> str:
     else:
         args += ["--to-root"]
     return _run("move_layer.py", args)
+
+
+def _set_layer_position(inp: dict) -> str:
+    args = [inp["psd_path"], inp["layer_path"]]
+    if inp.get("dx") is not None:
+        args += ["--dx", str(inp["dx"])]
+    if inp.get("dy") is not None:
+        args += ["--dy", str(inp["dy"])]
+    if inp.get("left") is not None:
+        args += ["--left", str(inp["left"])]
+    if inp.get("top") is not None:
+        args += ["--top", str(inp["top"])]
+    return _run("position_layer.py", args)
 
 
 def _remove_layer(inp: dict) -> str:

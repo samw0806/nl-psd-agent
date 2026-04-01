@@ -1,0 +1,85 @@
+{
+  "id": "script_position_transparent_cutout",
+  "layer": "script",
+  "paths": {
+    "fixture_path": "{workdir}/transparent_cutout.psd",
+    "modified_path": "{workdir}/moved.psd",
+    "exported_png": "{workdir}/moved.png"
+  },
+  "setup": [
+    {
+      "command": [
+        ".venv/bin/python",
+        "-c",
+        "import sys; from pathlib import Path; from PIL import Image, ImageDraw; sys.path.insert(0, str(Path.cwd() / 'scripts')); import _utils; from psd_tools import PSDImage; out = Path(r'{fixture_path}'); psd = PSDImage.new(mode='RGB', size=(500, 300), depth=8); bg = Image.new('RGBA', (500, 300), (240, 240, 240, 255)); psd.append(psd.create_pixel_layer(bg, name='Background', top=0, left=0)); cutout = Image.new('RGBA', (180, 180), (0, 0, 0, 0)); draw = ImageDraw.Draw(cutout); draw.ellipse((20, 20, 160, 160), fill=(200, 0, 0, 255)); draw.rectangle((80, 0, 100, 179), fill=(255, 215, 0, 180)); psd.append(psd.create_pixel_layer(cutout, name='Cutout', top=60, left=260)); psd.save(out)"
+      ],
+      "assertions": {
+        "exit_code": 0,
+        "files_exist": [
+          "{fixture_path}"
+        ],
+        "stderr_empty": true
+      }
+    }
+  ],
+  "input": {
+    "command": [
+      ".venv/bin/python",
+      "scripts/position_layer.py",
+      "{fixture_path}",
+      "Cutout",
+      "--dx",
+      "-120",
+      "--dy",
+      "20",
+      "--output",
+      "{modified_path}"
+    ]
+  },
+  "expected_behavior": "success",
+  "assertions": {
+    "exit_code": 0,
+    "stdout_contains": [
+      "旧位置: left=260, top=60",
+      "新位置: left=140, top=80"
+    ],
+    "files_exist": [
+      "{modified_path}"
+    ],
+    "stderr_empty": true,
+    "followup_commands": [
+      {
+        "command": [
+          ".venv/bin/python",
+          "scripts/export.py",
+          "{modified_path}",
+          "{exported_png}"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "files_exist": [
+            "{exported_png}"
+          ],
+          "stderr_empty": true
+        }
+      },
+      {
+        "command": [
+          ".venv/bin/python",
+          "-c",
+          "from pathlib import Path; from PIL import Image; from psd_tools import PSDImage; psd = PSDImage.open(Path(r'{modified_path}')); layer = next(child for child in psd if child.name == 'Cutout'); image = Image.open(Path(r'{exported_png}')).convert('RGBA'); pixels = image.load(); width, height = image.size; black = sum(1 for y in range(height) for x in range(width) if pixels[x, y] == (0, 0, 0, 255)); print('layer_bbox=' + str(layer.bbox)); print('mask_bbox=' + str(layer.mask.bbox)); print('black_opaque_pixels=' + str(black))"
+        ],
+        "assertions": {
+          "exit_code": 0,
+          "stdout_contains": [
+            "layer_bbox=(140, 80, 320, 260)",
+            "mask_bbox=(140, 80, 320, 260)",
+            "black_opaque_pixels=0"
+          ],
+          "stderr_empty": true
+        }
+      }
+    ]
+  },
+  "tags": ["script", "mutation", "transparent", "position", "regression"]
+}

@@ -102,6 +102,7 @@ python scripts/preview.py banner.psd
 python scripts/visibility.py banner.psd "Header/Logo" --hide
 python scripts/opacity.py banner.psd "Logo" 50%
 python scripts/add_layer.py banner.psd product.png --name "Product" --width 600 --center
+python scripts/position_layer.py banner.psd "Body/ProductShot" --dx 40 --dy 20
 python scripts/export.py banner.psd output.jpg --quality 90
 ```
 
@@ -113,7 +114,7 @@ python scripts/export.py banner.psd output.jpg --quality 90
 |------|------|
 | 查看 | 文件信息、图层树、合成预览、单图层预览 |
 | 属性 | 可见性、不透明度（0-255 或百分比）、混合模式 |
-| 结构 | 重命名、删除、移动到组、上移/下移 |
+| 结构 | 重命名、删除、移动到组、上移/下移、非组图层坐标移动 |
 | 新建 | 从外部图片插入像素图层（支持等比缩放 / contain / cover / 居中） |
 | 缩放 | 对已有像素图层做重建式缩放 |
 | 栅格化 | 将 Smart Object / Shape / Type 图层转为像素图层（不可逆，执行前确认） |
@@ -130,7 +131,8 @@ python scripts/export.py banner.psd output.jpg --quality 90
 - 编辑形状图层或智能对象
 - 图层样式（投影、描边、发光等）
 - 调整图层效果
-- Photoshop 式原生变换（任意图层的自由移动 / 旋转）
+- Photoshop 式原生变换（任意图层的自由旋转）
+- 组图层整体坐标移动（当前只支持非组图层坐标移动）
 
 ---
 
@@ -168,7 +170,7 @@ python scripts/export.py banner.psd output.jpg --quality 90
 
 ### 关键设计
 
-- **19 个独立 Python 脚本**：UNIX 单一职责哲学，每脚本完成一个操作
+- **20 个独立 Python 脚本**：UNIX 单一职责哲学，每脚本完成一个操作
 - **Session + 快照**：Web 模式下每次修改前自动拍快照，支持无限 Undo/Redo
 - **SSE 流式输出**：Agent 思考过程和工具调用状态实时推送到前端
 - **图层路径规则**：用 `/` 分隔层级，如 `"Header/Logo"` 表示 Header 组下的 Logo
@@ -185,7 +187,7 @@ nl-psd-agent/
 ├── AGENTS.md              # Codex 项目指引
 ├── requirements.txt       # Python 依赖（脚本层）
 │
-├── scripts/               # 19 个 Python CLI 脚本（核心）
+├── scripts/               # 20 个 Python CLI 脚本（核心）
 │   ├── _utils.py          # 公共工具（图层路径解析、错误处理）
 │   ├── info.py            # 查看文件信息 + 图层树
 │   ├── preview.py         # 合成预览 → .tmp/preview.png
@@ -195,6 +197,7 @@ nl-psd-agent/
 │   ├── rename.py          # 重命名图层
 │   ├── reorder.py         # 图层排序（上移/下移/指定索引）
 │   ├── move_layer.py      # 移动图层到组
+│   ├── position_layer.py  # 调整非组图层坐标
 │   ├── remove_layer.py    # 删除图层
 │   ├── add_layer.py       # 插入外部图片图层（含缩放）
 │   ├── resample_layer.py  # 像素图层重建式缩放

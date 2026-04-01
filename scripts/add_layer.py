@@ -150,6 +150,7 @@ def main():
     # 创建像素图层
     try:
         new_layer = psd.create_pixel_layer(img, name=layer_name, top=top, left=left)
+        new_layer.name = layer_name  # 确保写入 UNICODE_LAYER_NAME tagged block，避免中文乱码
         target.append(new_layer)
     except Exception as e:
         print(f"错误：创建图层失败: {e}", file=sys.stderr)

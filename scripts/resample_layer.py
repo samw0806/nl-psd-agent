@@ -110,6 +110,7 @@ def main():
     # 创建新图层（保持原位置）
     try:
         new_layer = psd.create_pixel_layer(resized, name=old_name, top=old_top, left=old_left)
+        new_layer.name = old_name  # 确保写入 UNICODE_LAYER_NAME tagged block，避免中文乱码
         new_layer.visible = old_visible
         new_layer.opacity = old_opacity
         new_layer.blend_mode = old_blend
